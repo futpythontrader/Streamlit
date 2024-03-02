@@ -1,22 +1,37 @@
 import streamlit as st
+import pandas as pd
 from login import show_login_page
 from tela1 import show_tela1
-# Importe as outras telas aqui
+from tela2 import show_tela2
 
-# Inicializando a sessão para armazenar o estado do usuário
-if 'logged_in' not in st.session_state:
+def logout():
     st.session_state['logged_in'] = False
+    st.experimental_rerun()
 
-# Mostrando a tela de login se o usuário não estiver logado
-if not st.session_state['logged_in']:
-    st.session_state['logged_in'] = show_login_page()
-else:
-    # Aqui você pode adicionar um menu ou botões para navegar entre as telas
-    # Por exemplo:
-    page = st.selectbox("Escolha sua tela", ["Tela 1", "Tela 2"])
-    
-    if page == "Tela 1":
-        show_tela1()
-    elif page == "Tela 2":
-        show_tela2()
-    # Adicione mais condições conforme necessário para suas outras telas
+def main():
+    if 'logged_in' not in st.session_state:
+        st.session_state['logged_in'] = False
+
+    if not st.session_state['logged_in']:
+        login_success = show_login_page()
+        if login_success:
+            st.session_state['logged_in'] = True
+            st.experimental_rerun()
+    else:
+        st.sidebar.title("Navegação")
+        if st.sidebar.button("Tela 1"):
+            st.session_state['current_page'] = "Tela 1"
+        if st.sidebar.button("Tela 2"):
+            st.session_state['current_page'] = "Tela 2"
+        if st.sidebar.button('Logout'):
+            logout()
+
+        # Renderizando a tela selecionada
+        if 'current_page' in st.session_state:
+            if st.session_state['current_page'] == "Tela 1":
+                show_tela1()
+            elif st.session_state['current_page'] == "Tela 2":
+                show_tela2()
+
+if __name__ == "__main__":
+    main()
